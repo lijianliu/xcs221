@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
+from matplotlib.widgets import Button
 
 
 # Function to parse the map file
@@ -57,11 +58,11 @@ def plot_map_with_animation(nodes, edges, paths, actions):
     # ax.plot(start_y, start_x, 'go', markersize=12, zorder=5)  # Start location in green
     # ax.plot(end_y, end_x, 'yo', markersize=12, zorder=5)  # End location in red
 
-    ax.plot(start_y, start_x, marker='*', color='gold', markersize=15, markeredgewidth=1.5, markeredgecolor='black',
-            alpha=0.8, zorder=3)
+    ax.plot(start_y, start_x, marker='o', color='yellow', markersize=10, markeredgewidth=1.5, markeredgecolor='black',
+            alpha=0.6, zorder=3)
 
-    ax.plot(end_y, end_x, marker='*', color='gold', markersize=15, markeredgewidth=1.5, markeredgecolor='red',
-            alpha=0.8, zorder=3)
+    ax.plot(end_y, end_x, marker='*', color='yellow', markersize=15, markeredgewidth=1.5, markeredgecolor='black',
+            alpha=0.6, zorder=3)
 
     # Draw the static map once
     for edge in edges:
@@ -70,6 +71,7 @@ def plot_map_with_animation(nodes, edges, paths, actions):
         ax.plot([y1, y2], [x1, x2], 'lightgray', linewidth=0.5)
 
     is_end_path_draw = False
+    steps = 100
 
     # Animation update function
     def update(frame):
@@ -80,10 +82,10 @@ def plot_map_with_animation(nodes, edges, paths, actions):
         if is_end_path_draw:
             return []
 
-        for n in range(1000):
-            index = 1000 * frame + n
+        for n in range(steps):
+            index = steps * frame + n
             if index < len(paths):
-                from_node, to_node = paths[1000 * frame + n]
+                from_node, to_node = paths[steps * frame + n]
                 x1, y1 = nodes[from_node]
                 x2, y2 = nodes[to_node]
                 ax.plot([y1, y2], [x1, x2], 'r-', linewidth=1)
@@ -100,14 +102,23 @@ def plot_map_with_animation(nodes, edges, paths, actions):
                 print(f"action_x={action_x}")
         return []
 
-    # Start the animation
-    print(f"paths={len(paths)}")
-    print(f"total_frames= {int(len(paths) / 1000) + 1}")
-    total_frames = int(len(paths) / 1000) + 1  # One extra frame for the actions
-    ani = animation.FuncAnimation(fig, update, frames=total_frames, interval=1000, blit=True, repeat=False)
+    def start_animation(event):
+        # Start the animation
+        print(f"paths={len(paths)}")
+        print(f"total_frames= {int(len(paths) / steps) + 1}")
+        total_frames = int(len(paths) / steps) + 1  # One extra frame for the actions
 
+        ani = animation.FuncAnimation(fig, update, frames=total_frames, interval=1, blit=True, repeat=False)
+        plt.show()
+
+    # Create a button axis
+    button_ax = plt.axes([0.81, 0.05, 0.1, 0.075])
+    button = Button(button_ax, 'Start')
+
+    # Assign the callback function to the button
+    button.on_clicked(start_animation)
     plt.show()
-    return ani
+    return
 
 
 # Paths to files
